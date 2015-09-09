@@ -1,5 +1,5 @@
 #pragma once
-#include <png++/png.hpp>
+#include "utils.hpp"
 
 using Pixel = png::rgb_pixel;
 using Image = png::image<Pixel>;
