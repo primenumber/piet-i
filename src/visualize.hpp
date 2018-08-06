@@ -5,8 +5,8 @@ using Pixel = png::rgb_pixel;
 using Image = png::image<Pixel>;
 using byte = png::byte;
 
-enum class Color {
-  BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, UNKNOWN
-};
+Hue what_hue(const Pixel &);
+Brightness what_lightness(const Pixel &);
+Color what_color(const Pixel &);
 
-void visualize(const Image&);
+void visualize(const Image &);

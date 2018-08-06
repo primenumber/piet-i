@@ -1,44 +1,7 @@
 #include "visualize.hpp"
 
-Color what_color(const Pixel& pixel) {
-  const byte r = pixel.red, g = pixel.green, b = pixel.blue;
-  const byte z = 0x00, c = 0xC0, f = 0xFF;
-  if ((r == z || r == c || r == f) &&
-      (g == z || g == c || g == f) &&
-      (b == z || b == c || b == f)) {
-    if (r == z && g == z && b == z) {
-      return Color::BLACK;
-    } else if (r == f && g == f && b == f) {
-      return Color::WHITE;
-    } else if (g == z && b == z) {
-      return Color::RED;
-    } else if (r == z && b == z) {
-      return Color::GREEN;
-    } else if (r == z && g == z) {
-      return Color::BLUE;
-    } else if (r == f && g == f) {
-      return Color::YELLOW;
-    } else if (g == f && b == f) {
-      return Color::CYAN;
-    } else if (r == f && b == f) {
-      return Color::MAGENTA;
-    } else if (r == f) {
-      return Color::RED;
-    } else if (g == f) {
-      return Color::GREEN;
-    } else if (b == f) {
-      return Color::BLUE;
-    } else if (b == z) {
-      return Color::YELLOW;
-    } else if (r == z) {
-      return Color::CYAN;
-    } else if (g == z) {
-      return Color::MAGENTA;
-    }
-  }
-  return Color::UNKNOWN;
-}
 
+/*
 Color how_bright(const Pixel& pixel) {
   const byte r = pixel.red, g = pixel.green, b = pixel.blue;
   const byte c = 0xC0;
@@ -52,7 +15,9 @@ Color how_bright(const Pixel& pixel) {
     return what_color(pixel);
   }
 }
+*/
 
+/*
 void show_pixel(const Pixel& pixel) {
   static const char* fore[] =
       {"\x1b[30;1m", "\x1b[31;1m", "\x1b[32;1m", "\x1b[33;1m",
@@ -63,7 +28,7 @@ void show_pixel(const Pixel& pixel) {
   const auto reset = "\x1b[0m";
   static const char text[] = {'K', 'R', 'G', 'Y', 'B', 'M', 'C', 'W'};
   const auto color = what_color(pixel);
-  const auto bright = how_bright(pixel);
+  const auto bright = what_lightness(pixel);
   if (color == Color::UNKNOWN) {
     std::cout << "?";
   } else {
@@ -72,6 +37,7 @@ void show_pixel(const Pixel& pixel) {
     std::cout << back[c] << fore[b] << text[c] << reset;
   }
 }
+*/
 
 size_t gcd(size_t a, size_t b) {
   if (b == 0) {
@@ -119,6 +85,7 @@ size_t codel_size(const Image& image) {
   return minimum;
 }
 
+/*
 void visualize(const Image& image) {
   const auto step = codel_size(image);
   for (size_t row = 0; row < image.get_height(); row += step) {
@@ -128,3 +95,4 @@ void visualize(const Image& image) {
     std::cout << std::endl;
   }
 }
+*/
