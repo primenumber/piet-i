@@ -2,6 +2,17 @@
 #include <queue>
 #include <tuple>
 
+FillMap::index_t FillMap::fill_all() {
+  for (size_t i = 0; i < height_; ++i) {
+    for (size_t j = 0; j < width_; ++j) {
+      if (!visited_table[i][j] && ::is_color(ref_table_[i][j])) {
+        filled_size.push_back(fill(j, i));
+      }
+    }
+  }
+  return index;
+}
+
 size_t FillMap::fill_impl(const int x, const int y) {
   size_t count = 0;
   visited_table[y][x] = true;

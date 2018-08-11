@@ -12,16 +12,7 @@ class FillMap {
       visited_table(height, std::vector<bool>(width, false)),
       filled_size(),
       ref_table_(ref_table){}
-  index_t fill_all() {
-    for (size_t i = 0; i < height_; ++i) {
-      for (size_t j = 0; j < width_; ++j) {
-        if (!visited_table[i][j] && ::is_color(ref_table_[i][j])) {
-          filled_size.push_back(fill(j, i));
-        }
-      }
-    }
-    return index;
-  }
+  index_t fill_all();
   size_t fill(const size_t x, const size_t y) {
     size_t res = fill_impl(x, y);
     ++index;
