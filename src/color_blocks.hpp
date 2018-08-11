@@ -123,7 +123,7 @@ class ColorBlockGraph {
     auto cache = make_cache_buf<ColorBlock::index_t>(width, height, invalid);
     std::vector<cache_t<bool>> visits(omp_get_max_threads());
 #pragma omp parallel for
-    for (size_t i = 0; i < omp_get_max_threads(); ++i) {
+    for (int i = 0; i < omp_get_max_threads(); ++i) {
       visits[i] = cache_t<bool>(height, cache_line_t<bool>(width, {{}}));
     }
 #pragma omp parallel for

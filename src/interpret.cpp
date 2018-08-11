@@ -186,7 +186,7 @@ std::shared_ptr<Command> Roll::exec(Stack & stack) const {
   if (stack.size() >= 2) {
     int iter = stack.top(); stack.pop();
     int depth = stack.top(); stack.pop();
-    if (depth >= 0 && stack.size() >= depth) {
+    if (depth >= 0 && stack.size() >= (size_t)depth) {
       if (depth > 0) {
         stack.roll(depth, mod(iter, depth));
       }
@@ -420,7 +420,7 @@ CommandGraph::CommandGraph(const pas::PAS &pas) : nodes() {
         throw new std::domain_error("Unknown PAS command");
     }
   }
-  for (int i = 0; i < nodes.size() - 1; ++i) {
+  for (size_t i = 0; i < nodes.size() - 1; ++i) {
     switch (pas.commands[i].inst) {
       case PASCommandType::HALT: break;
       case PASCommandType::JEZ:

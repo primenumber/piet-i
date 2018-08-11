@@ -28,7 +28,7 @@ size_t FillMap::fill_impl(const int x, const int y) {
     for (int i = 0; i < 4; ++i) {
       const int64_t nx = qx + dx[i];
       const int64_t ny = qy + dy[i];
-      if (nx < 0 || nx >= width_ || ny < 0 || ny >= height_) continue;
+      if (nx < 0 || nx >= (int64_t)width_ || ny < 0 || ny >= (int64_t)height_) continue;
       if (visited_table[ny][nx]) continue;
       if (ref_table_[qy][qx] != ref_table_[ny][nx]) continue;
       visited_table[ny][nx] = true;

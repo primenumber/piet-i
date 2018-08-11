@@ -63,7 +63,8 @@ ColorBlock::index_t search(size_t width, size_t height,
     visit[y][x][dp][cc] = true;
     int64_t nx = x + dx[dp];
     int64_t ny = y + dy[dp];
-    if (nx < 0 || ny < 0 || nx >= width || ny >= height || fm.is_black(nx, ny)) {
+    if (nx < 0 || ny < 0 || nx >= (int64_t)width || ny >= (int64_t)height
+        || fm.is_black(nx, ny)) {
       if (fm.is_white(x, y)) {
         cc = 1 - cc;
         dp++;
