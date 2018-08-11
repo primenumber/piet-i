@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
 #include <array>
-#include <map>
+#include <optional>
 #include <set>
 #include <tuple>
 #include <vector>
@@ -61,21 +61,13 @@ class Bound {
 
 class ColorBlock {
  public:
-  using index_t = std::tuple<int32_t, size_t, size_t, bool>;
+  using index_t = std::tuple<int32_t, uint8_t, uint8_t, bool>;
   ColorBlock(const Color color, const size_t size)
     : color_(color), size_(size) {
     next_blocks.fill(std::make_tuple(-1, 0, 0, false));
   }
-  void set_next_block(index_t index, size_t dp, size_t cc) {
-    assert(dp < 4);
-    assert(cc < 2);
-    next_blocks[dp * 2 + cc] = index;
-  }
-  index_t get_next_block(size_t dp, size_t cc) const {
-    assert(dp < 4);
-    assert(cc < 2);
-    return next_blocks[dp * 2 + cc];
-  }
+  void set_next_block(index_t index, uint8_t dp, uint8_t cc);
+  index_t get_next_block(uint8_t dp, uint8_t cc) const;
   Color get_color() const { return color_; }
   size_t get_size() const { return size_; }
  private:
@@ -84,7 +76,16 @@ class ColorBlock {
   std::array<index_t, 8> next_blocks;
 };
 
-ColorBlock::index_t search(size_t width, size_t height, int64_t x, int64_t y, size_t dp, size_t cc, const FillMap &fm, std::map<std::tuple<size_t, size_t, size_t, size_t>, ColorBlock::index_t> &cache);
+template <typename T>
+using cache_line_t = std::vector<std::array<std::array<T, 2>, 4>>;
+
+template <typename T>
+using cache_t = std::vector<cache_line_t<T>>;
+
+ColorBlock::index_t search(size_t width, size_t height, int64_t x, int64_t y, uint8_t dp, uint8_t cc, const FillMap &fm, cache_t<std::optional<ColorBlock::index_t>> &cache, cache_t<bool> &visit);
+
+std::tuple<std::vector<Bound>, std::vector<int32_t>> get_bounds(
+    const FillMap &fill_map, const size_t width, const size_t height);
 
 class ColorBlockGraph {
  public:
@@ -94,47 +95,41 @@ class ColorBlockGraph {
     const size_t width = table.width();
     FillMap fill_map(width, height, table);
     fill_map.fill_all();
-    std::vector<Bound> bounds(fill_map.index_count(), Bound(width, height));
-    std::vector<int> count(fill_map.index_count(), 0);
-    for (size_t i = 0; i < height; ++i) {
-      for (size_t j = 0; j < width; ++j) {
-        if (fill_map.get_index(j, i) >= 0) {
-          bounds[fill_map.get_index(j, i)].update(j, i);
-          ++count[fill_map.get_index(j, i)];
-        }
-      }
-    }
-    std::map<std::tuple<size_t, size_t, size_t, size_t>, ColorBlock::index_t> cache;
+    auto [bounds, count] = get_bounds(fill_map, width, height);
+    cache_t<std::optional<ColorBlock::index_t>> cache(
+        height, cache_line_t<std::optional<ColorBlock::index_t>>(width));
+    cache_t<bool> visit(height, cache_line_t<bool>(width, {{}}));
+    blocks.reserve(bounds.size());
     for (size_t i = 0; i < bounds.size(); ++i) {
       const auto &bound = bounds[i];
       size_t x = bound.top_r.min;
       size_t y = bound.top;
       blocks.emplace_back(table[y][x], count[i]);
-      auto next = search(width, height, x, y, 3, 0, fill_map, cache);
+      auto next = search(width, height, x, y, 3, 0, fill_map, cache, visit);
       blocks[i].set_next_block(next, 3, 0);
       x = bound.top_r.max;
-      next = search(width, height, x, y, 3, 1, fill_map, cache);
+      next = search(width, height, x, y, 3, 1, fill_map, cache, visit);
       blocks[i].set_next_block(next, 3, 1);
       x = bound.right;
       y = bound.right_r.min;
-      next = search(width, height, x, y, 0, 0, fill_map, cache);
+      next = search(width, height, x, y, 0, 0, fill_map, cache, visit);
       blocks[i].set_next_block(next, 0, 0);
       y = bound.right_r.max;
-      next = search(width, height, x, y, 0, 1, fill_map, cache);
+      next = search(width, height, x, y, 0, 1, fill_map, cache, visit);
       blocks[i].set_next_block(next, 0, 1);
       x = bound.bottom_r.max;
       y = bound.bottom;
-      next = search(width, height, x, y, 1, 0, fill_map, cache);
+      next = search(width, height, x, y, 1, 0, fill_map, cache, visit);
       blocks[i].set_next_block(next, 1, 0);
       x = bound.bottom_r.min;
-      next = search(width, height, x, y, 1, 1, fill_map, cache);
+      next = search(width, height, x, y, 1, 1, fill_map, cache, visit);
       blocks[i].set_next_block(next, 1, 1);
       x = bound.left;
       y = bound.left_r.max;
-      next = search(width, height, x, y, 2, 0, fill_map, cache);
+      next = search(width, height, x, y, 2, 0, fill_map, cache, visit);
       blocks[i].set_next_block(next, 2, 0);
       y = bound.left_r.min;
-      next = search(width, height, x, y, 2, 1, fill_map, cache);
+      next = search(width, height, x, y, 2, 1, fill_map, cache, visit);
       blocks[i].set_next_block(next, 2, 1);
     }
   }
