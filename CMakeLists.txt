@@ -11,5 +11,6 @@ add_executable(piet-i
   src/codel.cpp
   src/parser.cpp
   src/color_blocks.cpp
+  src/fillmap.cpp
 )
 target_link_libraries(piet-i png16)

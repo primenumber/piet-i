@@ -41,22 +41,7 @@ class FillMap {
   }
   index_t index_count() const { return index; }
  private:
-  size_t fill_impl(const int x, const int y) {
-    index_table[y][x] = index;
-    const int dx[] = {0, -1, 0, 1};
-    const int dy[] = {1, 0, -1, 0};
-    size_t count = 1;
-    for (int i = 0; i < 4; ++i) {
-      const int nx = x + dx[i];
-      const int ny = y + dy[i];
-      if (nx < 0 || nx >= width_ || ny < 0 || ny >= height_) continue;
-      if (visited_table[ny][nx]) continue;
-      if (ref_table_[y][x] != ref_table_[ny][nx]) continue;
-      visited_table[ny][nx] = true;
-      count += fill_impl(nx, ny);
-    }
-    return count;
-  }
+  size_t fill_impl(const int x, const int y);
   const size_t width_;
   const size_t height_;
   index_t index;
