@@ -208,10 +208,10 @@ CommandGraph::CommandGraph(const ColorBlockGraph &graph) : nodes() {
         bool conn;
         int old_dp = j, old_cc = k;
         for (size_t l = 0; l < 4; ++l) {
-          std::tie(index, dp, cc, conn) = graph[i].get_next_block(old_dp, old_cc);
+          std::tie(index, dp, cc, conn, std::ignore) = graph[i].get_next_block(old_dp, old_cc);
           if (index >= 0 || conn) break;
           old_cc = 1-old_cc;
-          std::tie(index, dp, cc, conn) = graph[i].get_next_block(old_dp, old_cc);
+          std::tie(index, dp, cc, conn, std::ignore) = graph[i].get_next_block(old_dp, old_cc);
           if (index >= 0 || conn) break;
           old_dp += 1;
           old_dp %= 4;
@@ -293,10 +293,10 @@ CommandGraph::CommandGraph(const ColorBlockGraph &graph) : nodes() {
         bool conn;
         int old_dp = j, old_cc = k;
         for (size_t l = 0; l < 4; ++l) {
-          std::tie(nindex, dp, cc, conn) = graph[i].get_next_block(old_dp, old_cc);
+          std::tie(nindex, dp, cc, conn, std::ignore) = graph[i].get_next_block(old_dp, old_cc);
           if (nindex >= 0 || conn) break;
           old_cc = 1-old_cc;
-          std::tie(nindex, dp, cc, conn) = graph[i].get_next_block(old_dp, old_cc);
+          std::tie(nindex, dp, cc, conn, std::ignore) = graph[i].get_next_block(old_dp, old_cc);
           if (nindex >= 0 || conn) break;
           old_dp += 1;
           old_dp %= 4;

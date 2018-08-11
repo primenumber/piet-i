@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(PIET_I)
-set(CMAKE_CXX_FLAGS "-std=c++17 -pg -g -Og -march=native -mtune=native -Wall -Wextra")
-set(CMAKE_LD_FLAGS "-pg")
+set(CMAKE_CXX_FLAGS "-std=c++17 -pg -fopenmp -g -Og -march=native -mtune=native -Wall -Wextra")
+set(CMAKE_LD_FLAGS "-pg -fopenmp")
 add_executable(piet-i
   src/main.cpp
   src/interpret.cpp

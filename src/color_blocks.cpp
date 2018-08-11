@@ -27,10 +27,21 @@ std::tuple<std::vector<Bound>, std::vector<int32_t>> get_bounds(
   return std::make_tuple(std::move(bounds), std::move(count));
 }
 
+// Lockless write
+// x86_64 guarantee 8byte aligned 8byte write atomically
+void write_cache(
+    cache_t<ColorBlock::index_t> &cache,
+    std::vector<std::tuple<size_t, size_t, uint8_t, uint8_t>> &&s,
+    const ColorBlock::index_t &res) {
+  for (auto &&t : s) {
+    auto [x, y, dp, cc] = t;
+    cache[y][x][dp][cc] = res;
+  }
+}
 
 ColorBlock::index_t search(size_t width, size_t height,
     int64_t x, int64_t y, uint8_t dp, uint8_t cc, const FillMap &fm,
-    cache_t<std::optional<ColorBlock::index_t>> &cache,
+    cache_t<ColorBlock::index_t> &cache,
     cache_t<bool> &visit) {
   int dx[] = {1, 0, -1, 0};
   int dy[] = {0, 1, 0, -1};
@@ -38,19 +49,14 @@ ColorBlock::index_t search(size_t width, size_t height,
   s.reserve(8);
   bool first = true;
   while (true) {
-    if (auto cache_opt = cache[y][x][dp][cc]) {
-      for (auto t : s) {
-        auto [x, y, dp, cc] = t;
-        cache[y][x][dp][cc] = cache_opt;
-      }
-      return *cache_opt;
+    auto elem = cache[y][x][dp][cc];
+    if (std::get<4>(elem)) {
+      write_cache(cache, std::move(s), elem);
+      return elem;
     }
     if (visit[y][x][dp][cc]) {
-      ColorBlock::index_t res(-1, 0, 0, true);
-      for (auto t : s) {
-        auto [x, y, dp, cc] = t;
-        cache[y][x][dp][cc] = res;
-      }
+      ColorBlock::index_t res(-1, 0, 0, true, true);
+      write_cache(cache, std::move(s), res);
       return res;
     }
     s.emplace_back(x, y, dp, cc);
@@ -63,19 +69,13 @@ ColorBlock::index_t search(size_t width, size_t height,
         dp++;
         dp %= 4;
       } else {
-        ColorBlock::index_t res(-1, 0, 0, false);
-        for (auto t : s) {
-          auto [x, y, dp, cc] = t;
-          cache[y][x][dp][cc] = res;
-        }
+        ColorBlock::index_t res(-1, 0, 0, false, true);
+        write_cache(cache, std::move(s), res);
         return res;
       }
     } else if (fm.is_color(nx, ny)) {
-      ColorBlock::index_t res(fm.get_index(nx, ny), dp, cc, first);
-      for (auto t : s) {
-        auto [x, y, dp, cc] = t;
-        cache[y][x][dp][cc] = res;
-      }
+      ColorBlock::index_t res(fm.get_index(nx, ny), dp, cc, first, true);
+      write_cache(cache, std::move(s), res);
       return res;
     } else {
       x = nx;

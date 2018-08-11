@@ -1,10 +1,10 @@
 #pragma once
 #include <cassert>
 #include <array>
-#include <optional>
 #include <set>
 #include <tuple>
 #include <vector>
+#include <omp.h>
 #include "codel.hpp"
 #include "fillmap.hpp"
 
@@ -61,10 +61,10 @@ class Bound {
 
 class ColorBlock {
  public:
-  using index_t = std::tuple<int32_t, uint8_t, uint8_t, bool>;
+  using index_t = std::tuple<int32_t, uint8_t, uint8_t, bool, bool>;
   ColorBlock(const Color color, const size_t size)
     : color_(color), size_(size) {
-    next_blocks.fill(std::make_tuple(-1, 0, 0, false));
+    next_blocks.fill(std::make_tuple(-1, 0, 0, false, false));
   }
   void set_next_block(index_t index, uint8_t dp, uint8_t cc);
   index_t get_next_block(uint8_t dp, uint8_t cc) const;
@@ -82,10 +82,26 @@ using cache_line_t = std::vector<std::array<std::array<T, 2>, 4>>;
 template <typename T>
 using cache_t = std::vector<cache_line_t<T>>;
 
-ColorBlock::index_t search(size_t width, size_t height, int64_t x, int64_t y, uint8_t dp, uint8_t cc, const FillMap &fm, cache_t<std::optional<ColorBlock::index_t>> &cache, cache_t<bool> &visit);
+ColorBlock::index_t search(size_t width, size_t height, int64_t x, int64_t y, uint8_t dp, uint8_t cc, const FillMap &fm, cache_t<ColorBlock::index_t> &cache, cache_t<bool> &visit);
 
 std::tuple<std::vector<Bound>, std::vector<int32_t>> get_bounds(
     const FillMap &fill_map, const size_t width, const size_t height);
+
+template <typename T>
+cache_t<T> make_cache_buf(const size_t width, const size_t height, const T& elem) {
+  std::array<std::array<T, 2>, 4> ary = {{
+    {{elem, elem}},
+    {{elem, elem}},
+    {{elem, elem}},
+    {{elem, elem}}
+  }};
+  cache_t<T> cache(height);
+#pragma omp parallel for
+  for (size_t i = 0; i < height; ++i) {
+    cache[i].resize(width, ary);
+  }
+  return cache;
+}
 
 class ColorBlockGraph {
  public:
@@ -96,15 +112,26 @@ class ColorBlockGraph {
     FillMap fill_map(width, height, table);
     fill_map.fill_all();
     auto [bounds, count] = get_bounds(fill_map, width, height);
-    cache_t<std::optional<ColorBlock::index_t>> cache(
-        height, cache_line_t<std::optional<ColorBlock::index_t>>(width));
-    cache_t<bool> visit(height, cache_line_t<bool>(width, {{}}));
     blocks.reserve(bounds.size());
     for (size_t i = 0; i < bounds.size(); ++i) {
       const auto &bound = bounds[i];
       size_t x = bound.top_r.min;
       size_t y = bound.top;
       blocks.emplace_back(table[y][x], count[i]);
+    }
+    ColorBlock::index_t invalid(-1, 0, 0, false, false);
+    auto cache = make_cache_buf<ColorBlock::index_t>(width, height, invalid);
+    std::vector<cache_t<bool>> visits(omp_get_max_threads());
+#pragma omp parallel for
+    for (size_t i = 0; i < omp_get_max_threads(); ++i) {
+      visits[i] = cache_t<bool>(height, cache_line_t<bool>(width, {{}}));
+    }
+#pragma omp parallel for
+    for (size_t i = 0; i < bounds.size(); ++i) {
+      cache_t<bool> &visit = visits[omp_get_thread_num()];
+      const auto &bound = bounds[i];
+      size_t x = bound.top_r.min;
+      size_t y = bound.top;
       auto next = search(width, height, x, y, 3, 0, fill_map, cache, visit);
       blocks[i].set_next_block(next, 3, 0);
       x = bound.top_r.max;
