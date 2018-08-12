@@ -1,7 +1,7 @@
 # piet-i
-A faster implementation of piet interpreter, written in C++
+A faster implementation of piet interpreter and compiler, written in C++
 
-need png++ library.
+need png++, openmp library.
 
 # build
 
