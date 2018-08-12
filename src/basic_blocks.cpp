@@ -23,8 +23,13 @@ std::ostream& operator<<(std::ostream &os, const BasicBlock &bb) {
   for (size_t i = 0; i < bb.commands.size(); ++i) {
     os << bb.commands[i]->to_cpp_string();
     if (i == bb.commands.size() - 1) {
-      for (size_t j = 0; j < bb.next_index.size(); ++j) {
-        os << "    case " << j << ":\n";
+      size_t length = bb.next_index.size();
+      for (size_t j = 0; j < length; ++j) {
+        if (j != length - 1) {
+          os << "    case " << j << ":\n";
+        } else {
+          os << "    default:\n";
+        }
         os << "      goto label" << bb.next_index[j] << ";\n";
       }
       if (bb.next_index.size() <= 1) break;
