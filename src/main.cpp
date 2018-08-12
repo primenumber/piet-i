@@ -3,6 +3,7 @@
 #include "visualize.hpp"
 #include "interpret.hpp"
 #include "color_blocks.hpp"
+#include "basic_blocks.hpp"
 
 int main(int argc, char* argv[]) {
   if (argc < 2) {
@@ -14,9 +15,9 @@ int main(int argc, char* argv[]) {
     CodelTable table(image, 1);
     ColorBlockGraph graph(table);
     CommandGraph cg(graph);
+    BasicBlockGraph bbg(cg);
     std::cerr << "Compile Completed" << std::endl;
-    cg.output();
-    cg.exec();
+    std::cout << bbg << std::flush;
   } catch (png::error& e) {
     std::cerr << e.what() << std::endl;
   }

@@ -72,6 +72,11 @@ std::shared_ptr<Command> Push::exec(Stack & stack) const {
   return next.lock();
 }
 
+std::shared_ptr<Command> PushArray::exec(Stack & stack) const {
+  stack.push_array(data);
+  return next.lock();
+}
+
 std::shared_ptr<Command> Duplicate::exec(Stack & stack) const {
   //std::cerr << "Duplicate" << std::endl;
   if (!stack.empty()) stack.push(stack.top());
