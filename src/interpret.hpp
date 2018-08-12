@@ -150,7 +150,7 @@ class Add : public BinaryOp {
   virtual int bin_op(int, int) const noexcept final;
 };
 
-class Substract : public BinaryOp {
+class Subtract : public BinaryOp {
  private:
   virtual int bin_op(int, int) const noexcept final;
 };

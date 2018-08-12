@@ -136,8 +136,8 @@ int Add::bin_op(int lhs, int rhs) const noexcept {
   return lhs + rhs;
 }
 
-int Substract::bin_op(int lhs, int rhs) const noexcept {
-  //std::cerr << "Substract" << std::endl;
+int Subtract::bin_op(int lhs, int rhs) const noexcept {
+  //std::cerr << "Subtract" << std::endl;
   return lhs - rhs;
 }
 
@@ -231,7 +231,7 @@ CommandGraph::CommandGraph(const ColorBlockGraph &graph) : nodes() {
               nodes.push_back(std::make_shared<Add>());
               break;
             case CommandType::SUBTRACT:
-              nodes.push_back(std::make_shared<Substract>());
+              nodes.push_back(std::make_shared<Subtract>());
               break;
             case CommandType::MULTIPLY:
               nodes.push_back(std::make_shared<Multiply>());
@@ -384,7 +384,7 @@ CommandGraph::CommandGraph(const pas::PAS &pas) : nodes() {
         nodes.push_back(std::make_shared<Add>());
         break;
       case PASCommandType::SUB:
-        nodes.push_back(std::make_shared<Substract>());
+        nodes.push_back(std::make_shared<Subtract>());
         break;
       case PASCommandType::MUL:
         nodes.push_back(std::make_shared<Multiply>());
