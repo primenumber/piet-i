@@ -445,6 +445,3 @@ void CommandGraph::exec() const {
     prog_ptr = prog_ptr->exec(stack);
   }
 }
-
-void CommandGraph::output() const {
-}

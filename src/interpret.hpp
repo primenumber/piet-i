@@ -197,7 +197,6 @@ class CommandGraph {
   explicit CommandGraph(const ColorBlockGraph &);
   explicit CommandGraph(const pas::PAS &);
   void exec() const;
-  void output() const;
  private:
   std::vector<std::shared_ptr<Command>> nodes;
 };
