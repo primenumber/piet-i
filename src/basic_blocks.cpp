@@ -28,12 +28,15 @@ std::ostream& operator<<(std::ostream &os, const BasicBlock &bb) {
       for (size_t j = 0; j < length; ++j) {
         if (j != length - 1) {
           os << "    case " << j << ":\n";
-        } else {
+        } else if (j) {
           os << "    default:\n";
         }
         os << "      goto label" << bb.next_index[j] << ";\n";
       }
-      if (bb.next_index.size() <= 1) break;
+      if (length == 0) {
+        os << "  exit(0);\n";
+      }
+      if (length <= 1) break;
       os << "  }\n";
     }
   }
