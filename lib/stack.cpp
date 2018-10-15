@@ -114,8 +114,8 @@ int32_t Stack::eq_zero() {
 void putchar_32(const int32_t val) {
   char32_t ch = static_cast<char32_t>(val);
   std::u32string u32s(1, ch);
-  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> u8tou32;
-  std::cout << u8tou32.to_bytes(u32s);
+  std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> u32tou8;
+  std::cout << u32tou8.to_bytes(u32s);
 }
 
 //std::shared_ptr<Command> InNumber::exec(Stack & stack) const {
