@@ -2,9 +2,8 @@
 #include <memory>
 #include <sstream>
 #include <stack>
+#include <stdexcept>
 #include <vector>
-#include <codecvt>
-#include <boost/optional.hpp>
 #include "pas.hpp"
 #include "color_blocks.hpp"
 
