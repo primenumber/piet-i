@@ -235,9 +235,15 @@ class Pop : public SinglePathCommand {
   std::shared_ptr<Command> exec(Stack &) const override final;
   virtual std::string to_cpp_string() const override final {
     std::stringstream ss;
-    ss << "  for (int32_t i = 0; i < " << count << "; ++i) {\n";
-    ss << "    stack.pop();\n";
-    ss << "  }\n";
+    if (count > 1) {
+      ss << "  for (int32_t i = 0; i < " << count << "; ++i) {\n";
+      ss << "    stack.pop();\n";
+      ss << "  }\n";
+    } else if (count == 1) {
+      ss << "  stack.pop();\n";
+    } else if (count < 0) {
+      throw std::range_error("cannot negative times pop");
+    }
     return ss.str();
   }
   virtual ConcreteCommandType command_type() const override final {
