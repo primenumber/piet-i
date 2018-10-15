@@ -1,4 +1,5 @@
 #include "basic_blocks.hpp"
+#include <algorithm>
 #include <memory>
 #include <map>
 #include <queue>
