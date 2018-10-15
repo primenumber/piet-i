@@ -6,13 +6,13 @@
 #include "basic_blocks.hpp"
 
 int main(int argc, char* argv[]) {
-  if (argc < 2) {
-    std::cerr << "usage: " << argv[0] << " [PNG FILENAME]" << std::endl;
+  if (argc < 3) {
+    std::cerr << "usage: " << argv[0] << " [PNG FILENAME] [CODEL SIZE]" << std::endl;
     return EXIT_FAILURE;
   }
   try {
     Image image(argv[1]);
-    CodelTable table(image, 1);
+    CodelTable table(image, std::stoi(argv[2]));
     ColorBlockGraph graph(table);
     CommandGraph cg(graph);
     BasicBlockGraph bbg(cg);
