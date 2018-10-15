@@ -151,6 +151,7 @@ std::ostream& operator<<(std::ostream &os, const BasicBlockGraph &bbg) {
   for (size_t i = 0; i < bbg.basic_blocks.size(); ++i) {
     os << "  label" << i << ":\n" << bbg.basic_blocks[i] << "\n";
   }
+  os << "  return 0;\n";
   os << "}";
   return os;
 }
